@@ -1,0 +1,16 @@
+
+
+#punto-grid {
+    border-collapse: collapse;
+    margin: 20px auto;
+}
+
+#punto-grid td {
+    border: 1px solid black;
+    height: 50px;
+    width: 50px;
+}
+
+#punto-grid td.grey {
+    background-color: grey;
+}
