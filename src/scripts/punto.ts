@@ -77,11 +77,25 @@ const testGetColor = () => {
     }
 }
 
+const clickedOnCell = (x: number, y: number) => {
+    console.log(`Click on (${x}, ${y}) cell`)
+}
+
+const setListeners = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const cell = grid[i][j]
+            cell.addEventListener('click', () => clickedOnCell(i, j))
+        }
+    }
+}
+
 const main = () => {
     testSetValue()
     testGetValue()
     testSetColor()
     testGetColor()
+    setListeners()
 }
 
 main()
