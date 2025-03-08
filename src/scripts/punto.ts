@@ -84,6 +84,17 @@ const isCorrectPlacement = (x: number, y: number, value: number) => {
     return isCorrectAdjacency(x, y) || cellValue && cellValue < value
 }
 
+const getDefaultCardSet = () => {
+    return [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9]
+}
+
+const getAndRemoveRandomCard = (cardSet: number[]) => {
+    const index = Math.floor(Math.random() * (cardSet.length - 1))
+    const card = cardSet[index]
+    cardSet.splice(index, 1)
+    return card
+}
+
 // TESTS
 const testSetValue = () => {
     for (let i = 0; i < GRID_SIZE; i++) {
@@ -175,6 +186,23 @@ const testIsCorrectPlacement = () => {
     }
 }
 
+const testGetAndRemoveRandomCard = () => {
+    const cardSet = getDefaultCardSet()
+    const pickedCards = []
+    for (let i = 0; i < 18; i++) {
+        pickedCards.push(getAndRemoveRandomCard(cardSet))
+    }
+    if (cardSet.length !== 0) {
+        throw new Error('Card set is not empty')
+    }
+    for (let i = 1; i <= 9; i++) {
+        if (pickedCards.filter(card => card === i).length !== 2) {
+            throw new Error(`Card ${i} is not picked twice`)
+        }
+    }
+}
+
+
 
 const main = () => {
     // testSetValue()
@@ -182,8 +210,17 @@ const main = () => {
     // testSetColor()
     // testGetColor()
     // testIsEmpty()
-    testIsCorrectPlacement()
+    // testIsCorrectAdjacency()
+    // testIsCorrectPlacement()
+    // testGetAndRemoveRandomCard()
     setListeners()
+
+    const redList = getDefaultCardSet()
+    const greenList = getDefaultCardSet()
+    const yellowList = getDefaultCardSet()
+    const blueList = getDefaultCardSet()
+
+
 }
 
 main()
