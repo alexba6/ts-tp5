@@ -1,5 +1,3 @@
-
-
 const gridElement = document.querySelector('#punto-grid')
 
 const GRID_SIZE = 11
@@ -11,12 +9,6 @@ for (let i = 0; i < GRID_SIZE; i++) {
     const row = []
     for (let j = 0; j < GRID_SIZE; j++) {
         const cell = document.createElement('td')
-
-        const middle = Math.floor(GRID_SIZE / 2)
-
-        if (i <= middle + 1 && i >= middle - 1 && j <= middle + 1 && j >= middle - 1 && (i !== middle || j !== middle)) {
-            cell.classList.add('grey')
-        }
 
         tr.appendChild(cell)
         row.push(cell)
@@ -40,11 +32,40 @@ const setColor = (x: number, y: number, color: string) => {
     cell.style.backgroundColor = color
 }
 
+const middle = Math.floor(GRID_SIZE / 2)
+
+for (let i = middle - 1; i <= middle + 1; i++) {
+    for (let j = middle - 1; j <= middle + 1; j++) {
+        if (i !== middle || j !== middle) {
+            setColor(i, j, 'grey')
+        }
+    }
+}
+
 const getColor = (x: number, y: number) => {
     const cell = grid[x][y]
     return cell.style.backgroundColor
 }
 
+const clickedOnCell = (x: number, y: number) => {
+    console.log(`Click on (${x}, ${y}) cell`)
+}
+
+const setListeners = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const cell = grid[i][j]
+            cell.addEventListener('click', () => clickedOnCell(i, j))
+        }
+    }
+}
+
+const isEmpty = (x: number, y: number) => {
+    return getValue(x, y) === ''
+}
+
+
+// TESTS
 const testSetValue = () => {
     for (let i = 0; i < GRID_SIZE; i++) {
         for (let j = 0; j < GRID_SIZE; j++) {
@@ -77,24 +98,24 @@ const testGetColor = () => {
     }
 }
 
-const clickedOnCell = (x: number, y: number) => {
-    console.log(`Click on (${x}, ${y}) cell`)
-}
-
-const setListeners = () => {
+const testIsEmpty = () => {
     for (let i = 0; i < GRID_SIZE; i++) {
         for (let j = 0; j < GRID_SIZE; j++) {
-            const cell = grid[i][j]
-            cell.addEventListener('click', () => clickedOnCell(i, j))
+            setValue(i, j, '')
+            console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
+            setValue(i, j, 'x')
+            console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
         }
     }
 }
 
+
 const main = () => {
-    testSetValue()
-    testGetValue()
-    testSetColor()
-    testGetColor()
+    // testSetValue()
+    // testGetValue()
+    // testSetColor()
+    // testGetColor()
+    // testIsEmpty()
     setListeners()
 }
 
