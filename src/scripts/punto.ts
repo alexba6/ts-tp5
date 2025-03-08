@@ -65,6 +65,17 @@ const isEmpty = (x: number, y: number) => {
 }
 
 
+const isCorrectAdjacency = (x: number, y: number) => {
+    for (let i = Math.max(x - 1, 0); i <= Math.min(x + 1, GRID_SIZE - 1); i++) {
+        for (let j = Math.max(y - 1, 0); j <= Math.min(y + 1, GRID_SIZE - 1); j++) {
+            if ((i !== x || j !== y) && !isEmpty(i, j)) {
+                return true
+            }
+        }
+    }
+    return false
+}
+
 // TESTS
 const testSetValue = () => {
     for (let i = 0; i < GRID_SIZE; i++) {
@@ -109,6 +120,22 @@ const testIsEmpty = () => {
     }
 }
 
+const testIsCorrectAdjacency = () => {
+    const testCross = [[3, 2], [4, 2], [4, 3]]
+
+    for (const [i, j] of testCross) {
+        setValue(i, j, 'x')
+    }
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            if (isCorrectAdjacency(i, j) && testCross.find(([x, y]) => x === i && y === j) === undefined) {
+                setColor(i, j, 'green')
+            }
+        }
+    }
+}
+
 
 const main = () => {
     // testSetValue()
@@ -116,6 +143,7 @@ const main = () => {
     // testSetColor()
     // testGetColor()
     // testIsEmpty()
+    testIsCorrectAdjacency()
     setListeners()
 }
 
