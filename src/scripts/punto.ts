@@ -17,14 +17,14 @@ for (let i = 0; i < GRID_SIZE; i++) {
     grid.push(row)
 }
 
-const setValue = (x: number, y: number, value: string) => {
+const setValue = (x: number, y: number, value: number | null) => {
     const cell = grid[x][y]
-    cell.textContent = value
+    cell.textContent = value === null ? '' : String(value)
 }   
 
-const getValue = (x: number, y: number) => {
+const getValue = (x: number, y: number): number | null => {
     const cell = grid[x][y]
-    return cell.textContent
+    return cell.textContent === '' ? null : Number(cell.textContent)
 }
 
 const setColor = (x: number, y: number, color: string) => {
@@ -61,11 +61,14 @@ const setListeners = () => {
 }
 
 const isEmpty = (x: number, y: number) => {
-    return getValue(x, y) === ''
+    return getValue(x, y) === null
 }
 
 
 const isCorrectAdjacency = (x: number, y: number) => {
+    if (!isEmpty(x, y)) {
+        return false
+    }
     for (let i = Math.max(x - 1, 0); i <= Math.min(x + 1, GRID_SIZE - 1); i++) {
         for (let j = Math.max(y - 1, 0); j <= Math.min(y + 1, GRID_SIZE - 1); j++) {
             if ((i !== x || j !== y) && !isEmpty(i, j)) {
@@ -76,11 +79,16 @@ const isCorrectAdjacency = (x: number, y: number) => {
     return false
 }
 
+const isCorrectPlacement = (x: number, y: number, value: number) => {
+    const cellValue = getValue(x, y)
+    return isCorrectAdjacency(x, y) || cellValue && cellValue < value
+}
+
 // TESTS
 const testSetValue = () => {
     for (let i = 0; i < GRID_SIZE; i++) {
         for (let j = 0; j < GRID_SIZE; j++) {
-            setValue(i, j, 'x')
+            setValue(i, j, 0)
         }
     }
 }
@@ -112,9 +120,9 @@ const testGetColor = () => {
 const testIsEmpty = () => {
     for (let i = 0; i < GRID_SIZE; i++) {
         for (let j = 0; j < GRID_SIZE; j++) {
-            setValue(i, j, '')
+            setValue(i, j, null)
             console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
-            setValue(i, j, 'x')
+            setValue(i, j, 1)
             console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
         }
     }
@@ -124,14 +132,45 @@ const testIsCorrectAdjacency = () => {
     const testCross = [[3, 2], [4, 2], [4, 3]]
 
     for (const [i, j] of testCross) {
-        setValue(i, j, 'x')
+        setValue(i, j, 1)
     }
 
     for (let i = 0; i < GRID_SIZE; i++) {
         for (let j = 0; j < GRID_SIZE; j++) {
-            if (isCorrectAdjacency(i, j) && testCross.find(([x, y]) => x === i && y === j) === undefined) {
+            if (isCorrectAdjacency(i, j)) {
                 setColor(i, j, 'green')
             }
+        }
+    }
+}
+
+const testIsCorrectPlacement = () => {
+    const testCross = [[3, 2, 5], [4, 2, 5], [4, 3, 5]]
+
+    for (const [i, j, v] of testCross) {
+        setValue(i, j, v)
+    }
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const cross = testCross.find(([x, y, _]) => x === i && y === j)
+            if (cross) {
+                if (isCorrectPlacement(i, j, cross[2] + 1)) {
+                    setColor(i, j, 'green')
+                }
+                if (isCorrectPlacement(i, j, cross[2])) {
+                    setColor(i, j, 'red')
+                }
+            } 
+            else {
+                if (isCorrectPlacement(i, j, 0)) {
+                    setColor(i, j, 'green')
+                }
+                else {
+                    setColor(i, j, 'red')
+                }
+            }
+            
         }
     }
 }
@@ -143,7 +182,7 @@ const main = () => {
     // testSetColor()
     // testGetColor()
     // testIsEmpty()
-    testIsCorrectAdjacency()
+    testIsCorrectPlacement()
     setListeners()
 }
 
