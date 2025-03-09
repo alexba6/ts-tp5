@@ -1,5 +1,6 @@
 
 const GRID_SIZE = 11
+const MIDDLE_GRID = Math.floor(GRID_SIZE / 2)
 
 const grid: HTMLTableCellElement[][] = []
 
@@ -10,6 +11,16 @@ enum ColorPlayer {
     BLUE = 'blue'
 }
 
+
+const resetGrid = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const cell = grid[i][j]
+            cell.textContent = ''
+            cell.style.backgroundColor = ''
+        }
+    }
+}
 
 const setValue = (x: number, y: number, value: number | null) => {
     const cell = grid[x][y]
@@ -37,9 +48,9 @@ const testGetValue = () => {
     }
 }
 
-const setColor = (x: number, y: number, color: ColorPlayer) => {
+const setColor = (x: number, y: number, color: ColorPlayer | null) => {
     const cell = grid[x][y]
-    cell.style.backgroundColor = color.toString()
+    cell.style.backgroundColor = color ? color.toString() : ''
 }
 
 const testSetColor = () => {
@@ -203,6 +214,74 @@ const getNextPlayer = (currentPlayer: ColorPlayer) => {
     return players[(index + 1) % players.length]
 }
 
+
+const hasWon = (color: ColorPlayer) => {
+    const checkNearCell = (x: number, y: number, dx: number, dy: number) => {
+        for (let i=0;i<4;i++) {
+            if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) {
+                return false
+            }
+            if (getColor(x, y) !== color) {
+                return false
+            }
+            x += dx
+            y += dy
+        }
+        return true
+    }
+
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            if (getColor(i, j) === color) {
+                // Check all directions
+                const vertical = checkNearCell(i, j, 1, 0)
+                const horizontal = checkNearCell(i, j, 0, 1)
+                const diagonal1 = checkNearCell(i, j, 1, 1)
+                const diagonal2 = checkNearCell(i, j, 1, -1)
+
+                if (vertical || horizontal || diagonal1 || diagonal2) {
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
+
+const testHasWon = () => {
+    for (let i = 0; i < 4; i++) {
+        setValue(MIDDLE_GRID + i, MIDDLE_GRID, 1)
+        setColor(MIDDLE_GRID + i, MIDDLE_GRID, ColorPlayer.RED)
+    }
+    if (!hasWon(ColorPlayer.RED) || hasWon(ColorPlayer.GREEN) || hasWon(ColorPlayer.YELLOW) || hasWon(ColorPlayer.BLUE)) {
+        throw new Error('Error in hasWon')
+    }
+    resetGrid()
+    for (let i = 0; i < 4; i++) {
+        setValue(MIDDLE_GRID, MIDDLE_GRID + i, 1)
+        setColor(MIDDLE_GRID , MIDDLE_GRID + i, ColorPlayer.GREEN)
+    }
+    if (!hasWon(ColorPlayer.GREEN) || hasWon(ColorPlayer.RED) || hasWon(ColorPlayer.YELLOW) || hasWon(ColorPlayer.BLUE)) {
+        throw new Error('Error in hasWon')
+    }
+    resetGrid()
+    for (let i = 0; i < 4; i++) {
+        setValue(MIDDLE_GRID + i, MIDDLE_GRID + i, 1)
+        setColor(MIDDLE_GRID + i, MIDDLE_GRID + i, ColorPlayer.YELLOW)
+    }
+    if (!hasWon(ColorPlayer.YELLOW) || hasWon(ColorPlayer.RED) || hasWon(ColorPlayer.GREEN) || hasWon(ColorPlayer.BLUE)) {
+        throw new Error('Error in hasWon')
+    }
+    resetGrid()
+    for (let i = 0; i < 4; i++) {
+        setValue(MIDDLE_GRID + i, MIDDLE_GRID - i, 1)
+        setColor(MIDDLE_GRID + i, MIDDLE_GRID - i, ColorPlayer.BLUE)
+    }
+    if (!hasWon(ColorPlayer.BLUE) || hasWon(ColorPlayer.RED) || hasWon(ColorPlayer.GREEN) || hasWon(ColorPlayer.YELLOW)) {
+        throw new Error('Error in hasWon')
+    }
+}
+
 const main = () => {
     const gridElement = document.querySelector('#punto-grid')
     // Create grid
@@ -220,11 +299,9 @@ const main = () => {
     }
 
     // Paint the middle of the grid
-    const middle = Math.floor(GRID_SIZE / 2)
-
-    for (let i = middle - 1; i <= middle + 1; i++) {
-        for (let j = middle - 1; j <= middle + 1; j++) {
-            if (i !== middle || j !== middle) {
+    for (let i = MIDDLE_GRID - 1; i <= MIDDLE_GRID + 1; i++) {
+        for (let j = MIDDLE_GRID - 1; j <= MIDDLE_GRID + 1; j++) {
+            if (i !== MIDDLE_GRID || j !== MIDDLE_GRID) {
                 grid[i][j].classList.add('grey')
             }
         }
@@ -240,24 +317,26 @@ const main = () => {
     // testIsCorrectPlacement()
     // testGetAndRemoveRandomCard()
 
-    const playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
+    testHasWon()
 
-    let currentPlayer = ColorPlayer.RED
-    let cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+    // const playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
 
-    console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
+    // let currentPlayer = ColorPlayer.RED
+    // let cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
 
-    setListeners((x, y) => {
-        console.log(`Clicked on cell (${x}, ${y})`)
-        if (isCorrectPlacement(x, y, cardToPlay)) {
-            setValue(x, y, cardToPlay)
-            setColor(x, y, currentPlayer)
+    // console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
 
-            currentPlayer = getNextPlayer(currentPlayer)
-            cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
-            console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
-        }
-    })
+    // setListeners((x, y) => {
+    //     console.log(`Clicked on cell (${x}, ${y})`)
+    //     if (isCorrectPlacement(x, y, cardToPlay)) {
+    //         setValue(x, y, cardToPlay)
+    //         setColor(x, y, currentPlayer)
+
+    //         currentPlayer = getNextPlayer(currentPlayer)
+    //         cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+    //         console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
+    //     }
+    // })
 }
 
 main()
