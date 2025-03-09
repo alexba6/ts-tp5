@@ -5,6 +5,9 @@
     justify-content: center;
     align-items: center;
     font-size: 22px;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .punto-title {

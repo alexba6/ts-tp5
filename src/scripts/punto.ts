@@ -391,14 +391,15 @@ const main = () => {
             setColor(x, y, currentPlayer)
 
             if (hasWon(currentPlayer)) {
-                alert(`Player ${currentPlayer} has won`)
+                setTimeout(() => {
+                    alert(`Player ${currentPlayer} has won`)
 
-                resetGrid()
-
-                playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
-                currentPlayer = ColorPlayer.RED
-                cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
-
+                    resetGrid()
+    
+                    playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
+                    currentPlayer = ColorPlayer.RED
+                    cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+                }, 100)
             } else {
                 currentPlayer = getNextPlayer(currentPlayer)
                 cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
