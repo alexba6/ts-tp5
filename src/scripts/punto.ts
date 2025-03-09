@@ -1,57 +1,71 @@
-const gridElement = document.querySelector('#punto-grid')
 
 const GRID_SIZE = 11
 
 const grid: HTMLTableCellElement[][] = []
 
-for (let i = 0; i < GRID_SIZE; i++) {
-    const tr = document.createElement('tr')
-    const row = []
-    for (let j = 0; j < GRID_SIZE; j++) {
-        const cell = document.createElement('td')
-
-        tr.appendChild(cell)
-        row.push(cell)
-    }
-    gridElement?.appendChild(tr)
-    grid.push(row)
+enum ColorPlayer {
+    RED = 'red',
+    GREEN = 'green',
+    YELLOW = 'yellow',
+    BLUE = 'blue'
 }
+
 
 const setValue = (x: number, y: number, value: number | null) => {
     const cell = grid[x][y]
     cell.textContent = value === null ? '' : String(value)
 }   
 
+const testSetValue = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            setValue(i, j, 0)
+        }
+    }
+}
+
 const getValue = (x: number, y: number): number | null => {
     const cell = grid[x][y]
     return cell.textContent === '' ? null : Number(cell.textContent)
 }
 
-const setColor = (x: number, y: number, color: string) => {
-    const cell = grid[x][y]
-    cell.style.backgroundColor = color
-}
-
-const middle = Math.floor(GRID_SIZE / 2)
-
-for (let i = middle - 1; i <= middle + 1; i++) {
-    for (let j = middle - 1; j <= middle + 1; j++) {
-        if (i !== middle || j !== middle) {
-            setColor(i, j, 'grey')
+const testGetValue = () => {    
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            console.log(`(${i}, ${j}): ${getValue(i, j)}`)
         }
     }
 }
 
-const getColor = (x: number, y: number) => {
+const setColor = (x: number, y: number, color: ColorPlayer) => {
     const cell = grid[x][y]
-    return cell.style.backgroundColor
+    cell.style.backgroundColor = color.toString()
 }
 
-const clickedOnCell = (x: number, y: number) => {
-    console.log(`Click on (${x}, ${y}) cell`)
+const testSetColor = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            setColor(i, j, 'red')
+        }
+    }
 }
 
-const setListeners = () => {
+const getColor = (x: number, y: number): ColorPlayer | null  => {
+    const cell = grid[x][y]
+    const players = Object.values(ColorPlayer)
+    const player = players.find(player => cell.style.backgroundColor === player)
+    return player || null
+}
+
+const testGetColor = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            console.log(`(${i}, ${j}): ${getColor(i, j)}`)
+        }
+    }
+}
+
+const setListeners = (clickedOnCell: (x: number, y: number) => void) => {
     for (let i = 0; i < GRID_SIZE; i++) {
         for (let j = 0; j < GRID_SIZE; j++) {
             const cell = grid[i][j]
@@ -64,6 +78,27 @@ const isEmpty = (x: number, y: number) => {
     return getValue(x, y) === null
 }
 
+const testIsEmpty = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            setValue(i, j, null)
+            console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
+            setValue(i, j, 1)
+            console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
+        }
+    }
+}
+
+const isEmptyGrid = () => {
+    for (let i = 0; i < GRID_SIZE; i++) {
+        for (let j = 0; j < GRID_SIZE; j++) {
+            if (!isEmpty(i, j)) {
+                return false
+            }
+        }
+    }
+    return true
+}
 
 const isCorrectAdjacency = (x: number, y: number) => {
     if (!isEmpty(x, y)) {
@@ -77,66 +112,6 @@ const isCorrectAdjacency = (x: number, y: number) => {
         }
     }
     return false
-}
-
-const isCorrectPlacement = (x: number, y: number, value: number) => {
-    const cellValue = getValue(x, y)
-    return isCorrectAdjacency(x, y) || cellValue && cellValue < value
-}
-
-const getDefaultCardSet = () => {
-    return [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9]
-}
-
-const getAndRemoveRandomCard = (cardSet: number[]) => {
-    const index = Math.floor(Math.random() * (cardSet.length - 1))
-    const card = cardSet[index]
-    cardSet.splice(index, 1)
-    return card
-}
-
-// TESTS
-const testSetValue = () => {
-    for (let i = 0; i < GRID_SIZE; i++) {
-        for (let j = 0; j < GRID_SIZE; j++) {
-            setValue(i, j, 0)
-        }
-    }
-}
-
-const testGetValue = () => {    
-    for (let i = 0; i < GRID_SIZE; i++) {
-        for (let j = 0; j < GRID_SIZE; j++) {
-            console.log(`(${i}, ${j}): ${getValue(i, j)}`)
-        }
-    }
-}
-
-const testSetColor = () => {
-    for (let i = 0; i < GRID_SIZE; i++) {
-        for (let j = 0; j < GRID_SIZE; j++) {
-            setColor(i, j, 'red')
-        }
-    }
-}
-
-const testGetColor = () => {
-    for (let i = 0; i < GRID_SIZE; i++) {
-        for (let j = 0; j < GRID_SIZE; j++) {
-            console.log(`(${i}, ${j}): ${getColor(i, j)}`)
-        }
-    }
-}
-
-const testIsEmpty = () => {
-    for (let i = 0; i < GRID_SIZE; i++) {
-        for (let j = 0; j < GRID_SIZE; j++) {
-            setValue(i, j, null)
-            console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
-            setValue(i, j, 1)
-            console.log(`(${i}, ${j}): ${isEmpty(i, j)}`)
-        }
-    }
 }
 
 const testIsCorrectAdjacency = () => {
@@ -153,6 +128,14 @@ const testIsCorrectAdjacency = () => {
             }
         }
     }
+}
+
+const isCorrectPlacement = (x: number, y: number, value: number) => {
+    if (isEmptyGrid() && x == Math.floor(GRID_SIZE / 2) && y == Math.floor(GRID_SIZE / 2)) {
+        return true
+    }
+    const cellValue = getValue(x, y)
+    return isCorrectAdjacency(x, y) || cellValue && cellValue < value
 }
 
 const testIsCorrectPlacement = () => {
@@ -186,6 +169,17 @@ const testIsCorrectPlacement = () => {
     }
 }
 
+const getDefaultCardSet = () => {
+    return [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9]
+}
+
+const getAndRemoveRandomCard = (cardSet: number[]) => {
+    const index = Math.floor(Math.random() * (cardSet.length - 1))
+    const card = cardSet[index]
+    cardSet.splice(index, 1)
+    return card
+}
+
 const testGetAndRemoveRandomCard = () => {
     const cardSet = getDefaultCardSet()
     const pickedCards = []
@@ -202,9 +196,41 @@ const testGetAndRemoveRandomCard = () => {
     }
 }
 
-
+const getNextPlayer = (currentPlayer: ColorPlayer) => {
+    const players = Object.values(ColorPlayer)
+    const index = players.indexOf(currentPlayer)
+    console.log(players, index, currentPlayer)
+    return players[(index + 1) % players.length]
+}
 
 const main = () => {
+    const gridElement = document.querySelector('#punto-grid')
+    // Create grid
+    for (let i = 0; i < GRID_SIZE; i++) {
+        const tr = document.createElement('tr')
+        const row = []
+        for (let j = 0; j < GRID_SIZE; j++) {
+            const cell = document.createElement('td')
+    
+            tr.appendChild(cell)
+            row.push(cell)
+        }
+        gridElement?.appendChild(tr)
+        grid.push(row)
+    }
+
+    // Paint the middle of the grid
+    const middle = Math.floor(GRID_SIZE / 2)
+
+    for (let i = middle - 1; i <= middle + 1; i++) {
+        for (let j = middle - 1; j <= middle + 1; j++) {
+            if (i !== middle || j !== middle) {
+                grid[i][j].classList.add('grey')
+            }
+        }
+    }
+
+    // // TESTS
     // testSetValue()
     // testGetValue()
     // testSetColor()
@@ -213,14 +239,25 @@ const main = () => {
     // testIsCorrectAdjacency()
     // testIsCorrectPlacement()
     // testGetAndRemoveRandomCard()
-    setListeners()
 
-    const redList = getDefaultCardSet()
-    const greenList = getDefaultCardSet()
-    const yellowList = getDefaultCardSet()
-    const blueList = getDefaultCardSet()
+    const playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
 
+    let currentPlayer = ColorPlayer.RED
+    let cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
 
+    console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
+
+    setListeners((x, y) => {
+        console.log(`Clicked on cell (${x}, ${y})`)
+        if (isCorrectPlacement(x, y, cardToPlay)) {
+            setValue(x, y, cardToPlay)
+            setColor(x, y, currentPlayer)
+
+            currentPlayer = getNextPlayer(currentPlayer)
+            cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+            console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
+        }
+    })
 }
 
 main()
