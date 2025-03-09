@@ -4,6 +4,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-size: 22px;
 }
 
 .punto-title {
@@ -26,6 +27,10 @@
     height: 75px;
     border-radius: 5px;
     border: solid 1px black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
 }
 
 .punto-grid-container {
@@ -40,6 +45,8 @@
     border: 1px solid black;
     height: 50px;
     width: 50px;
+    text-align: center;
+    font-size: 28px;
 }
 
 #punto-grid td.grey {
