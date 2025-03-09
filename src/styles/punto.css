@@ -1,8 +1,39 @@
 
+.punto-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.punto-title {
+    margin: 10px 0;
+}
+
+.punto-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.punto-card p {
+    font-size: 22px;
+}
+
+#card-to-play {
+    width: 75px;
+    height: 75px;
+    border-radius: 5px;
+    border: solid 1px black;
+}
+
+.punto-grid-container {
+    margin: 20px 0;
+}
 
 #punto-grid {
     border-collapse: collapse;
-    margin: 20px auto;
 }
 
 #punto-grid td {

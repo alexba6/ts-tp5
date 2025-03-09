@@ -4,6 +4,12 @@ const MIDDLE_GRID = Math.floor(GRID_SIZE / 2)
 
 const grid: HTMLTableCellElement[][] = []
 
+const cardToPlay = document.querySelector<HTMLDivElement>('#card-to-play')
+
+if (cardToPlay == null) {
+    throw new Error('Card to play element not found')
+}
+
 enum ColorPlayer {
     RED = 'red',
     GREEN = 'green',
@@ -286,7 +292,6 @@ const isWithimLimits = (x: number, y: number) => {
     const checkEmptyAreaX = (startX: number, direction: number) => {
         for (let i = startX; i >= 0 && i < GRID_SIZE; i += direction) {
             for (let j = 0; j < GRID_SIZE; j++) {
-                setColor(i, j, ColorPlayer.RED)
                 if (!isEmpty(i, j)) {
                     return false
                 }
@@ -298,7 +303,6 @@ const isWithimLimits = (x: number, y: number) => {
     const checkEmptyAreaY = (startY: number, direction: number) => {
         for (let j = startY; j >= 0 && j < GRID_SIZE; j += direction) {
             for (let i = 0; i < GRID_SIZE; i++) {
-                setColor(i, j, ColorPlayer.RED)
                 if (!isEmpty(i, j)) {
                     return false
                 }
@@ -325,8 +329,18 @@ const testIsWithimLimits = () => {
     resetGrid()
 }
 
+const updateCardToPlayDisplay = (currentPlay: ColorPlayer, value: number) =>  {
+    cardToPlay.style.backgroundColor = currentPlay
+    cardToPlay.textContent = String(value)
+}
+
 const main = () => {
-    const gridElement = document.querySelector('#punto-grid')
+    const gridElement = document.querySelector<HTMLTableElement>('#punto-grid')
+
+    if (gridElement == null) {
+        throw new Error('Grid element not found')
+    }
+
     // Create grid
     for (let i = 0; i < GRID_SIZE; i++) {
         const tr = document.createElement('tr')
@@ -337,7 +351,7 @@ const main = () => {
             tr.appendChild(cell)
             row.push(cell)
         }
-        gridElement?.appendChild(tr)
+        gridElement.appendChild(tr)
         grid.push(row)
     }
 
@@ -363,24 +377,36 @@ const main = () => {
     // testIsWithimLimits()
 
 
-    // const playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
+    let playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
+    let currentPlayer = ColorPlayer.RED
+    let cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+    updateCardToPlayDisplay(currentPlayer, cardToPlay)
 
-    // let currentPlayer = ColorPlayer.RED
-    // let cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+    console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
 
-    // console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
+    setListeners((x, y) => {
+        console.log(`Clicked on cell (${x}, ${y})`)
+        if (isCorrectPlacement(x, y, cardToPlay) && isWithimLimits(x, y)) {
+            setValue(x, y, cardToPlay)
+            setColor(x, y, currentPlayer)
 
-    // setListeners((x, y) => {
-    //     console.log(`Clicked on cell (${x}, ${y})`)
-    //     if (isCorrectPlacement(x, y, cardToPlay)) {
-    //         setValue(x, y, cardToPlay)
-    //         setColor(x, y, currentPlayer)
+            if (hasWon(currentPlayer)) {
+                alert(`Player ${currentPlayer} has won`)
 
-    //         currentPlayer = getNextPlayer(currentPlayer)
-    //         cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
-    //         console.log(`Player ${currentPlayer} plays card ${cardToPlay}`)
-    //     }
-    // })
+                resetGrid()
+
+                playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
+                currentPlayer = ColorPlayer.RED
+                cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+
+            } else {
+                currentPlayer = getNextPlayer(currentPlayer)
+                cardToPlay = getAndRemoveRandomCard(playerLists[currentPlayer])
+            }
+
+            updateCardToPlayDisplay(currentPlayer, cardToPlay)
+        }
+    })
 }
 
 main()
