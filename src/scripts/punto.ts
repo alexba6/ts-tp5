@@ -282,6 +282,49 @@ const testHasWon = () => {
     }
 }
 
+const isWithimLimits = (x: number, y: number) => {
+    const checkEmptyAreaX = (startX: number, direction: number) => {
+        for (let i = startX; i >= 0 && i < GRID_SIZE; i += direction) {
+            for (let j = 0; j < GRID_SIZE; j++) {
+                setColor(i, j, ColorPlayer.RED)
+                if (!isEmpty(i, j)) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    const checkEmptyAreaY = (startY: number, direction: number) => {
+        for (let j = startY; j >= 0 && j < GRID_SIZE; j += direction) {
+            for (let i = 0; i < GRID_SIZE; i++) {
+                setColor(i, j, ColorPlayer.RED)
+                if (!isEmpty(i, j)) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    const MAX_EXETRYCITY = 6
+
+    return checkEmptyAreaX(x + MAX_EXETRYCITY, 1) && checkEmptyAreaX(x - MAX_EXETRYCITY, -1) && checkEmptyAreaY(y + MAX_EXETRYCITY, 1) && checkEmptyAreaY(y - MAX_EXETRYCITY, -1)
+}
+
+const testIsWithimLimits = () => {
+    setValue(0, 0, 1)
+    if (isWithimLimits(GRID_SIZE - 1, GRID_SIZE - 1) || !isWithimLimits(MIDDLE_GRID, MIDDLE_GRID)) {
+        throw new Error('Error in isWithimLimits')
+    }
+    resetGrid()
+    setValue(GRID_SIZE - 1, GRID_SIZE - 1, 1)
+    if (isWithimLimits(0, 0) || !isWithimLimits(MIDDLE_GRID, MIDDLE_GRID)) {
+        throw new Error('Error in isWithimLimits')
+    }
+    resetGrid()
+}
+
 const main = () => {
     const gridElement = document.querySelector('#punto-grid')
     // Create grid
@@ -316,8 +359,9 @@ const main = () => {
     // testIsCorrectAdjacency()
     // testIsCorrectPlacement()
     // testGetAndRemoveRandomCard()
+    // testHasWon()
+    // testIsWithimLimits()
 
-    testHasWon()
 
     // const playerLists = Object.fromEntries(Object.values(ColorPlayer).map(color => [color, getDefaultCardSet()]))
 
